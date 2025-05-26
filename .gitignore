@@ -83,4 +83,7 @@ data/*.json
 
 # Assignment files (not part of the project)
 Questions.txt
+Assessment.txt
 DEVELOPMENT_ROADMAP.md
+PROJECT_REQUIREMENTS_ANALYSIS.md
+ASSESSMENT_RUBRIC_ANALYSIS.md
