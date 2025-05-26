@@ -1,4 +1,8 @@
 import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
+import javax.swing.JScrollPane;
+import java.awt.Font;
+import java.awt.Dimension;
 import java.io.FileWriter;
 import java.io.FileReader;
 import java.io.IOException;
@@ -415,7 +419,84 @@ public class Message {
     }
     
     /**
-     * Displays comprehensive report of all sent messages
+     * Displays comprehensive report using JOptionPane with scrollable text area
+     */
+    public static void displayComprehensiveReportGUI() {
+        StringBuilder report = new StringBuilder();
+        
+        report.append("QUICKCHAT COMPREHENSIVE REPORT\n");
+        report.append("=".repeat(50)).append("\n\n");
+        
+        report.append("📊 SUMMARY STATISTICS:\n");
+        report.append("   Total Sent Messages: ").append(sentMessages.size()).append("\n");
+        report.append("   Total Stored Messages: ").append(storedMessages.size()).append("\n");
+        report.append("   Total Disregarded Messages: ").append(disregardedMessages.size()).append("\n");
+        report.append("   Total Messages: ").append(sentMessages.size() + storedMessages.size() + disregardedMessages.size()).append("\n\n");
+        
+        if (!sentMessages.isEmpty()) {
+            report.append("📤 SENT MESSAGES DETAILS:\n");
+            report.append("-".repeat(50)).append("\n");
+            for (int i = 0; i < sentMessages.size(); i++) {
+                Message msg = sentMessages.get(i);
+                report.append("Message ").append(i + 1).append(":\n");
+                report.append("   Hash: ").append(msg.messageHash).append("\n");
+                report.append("   Recipient: ").append(msg.recipientCell).append("\n");
+                report.append("   Message: ").append(msg.messageText).append("\n");
+                report.append("   Message ID: ").append(msg.messageID).append("\n\n");
+            }
+        }
+        
+        if (!storedMessages.isEmpty()) {
+            report.append("💾 STORED MESSAGES:\n");
+            report.append("-".repeat(50)).append("\n");
+            for (int i = 0; i < storedMessages.size(); i++) {
+                Message msg = storedMessages.get(i);
+                report.append("Stored Message ").append(i + 1).append(":\n");
+                report.append("   Hash: ").append(msg.messageHash).append("\n");
+                report.append("   Recipient: ").append(msg.recipientCell).append("\n");
+                report.append("   Message: ").append(msg.messageText).append("\n\n");
+            }
+        }
+        
+        if (!disregardedMessages.isEmpty()) {
+            report.append("🗑️  DISREGARDED MESSAGES:\n");
+            report.append("-".repeat(50)).append("\n");
+            for (int i = 0; i < disregardedMessages.size(); i++) {
+                Message msg = disregardedMessages.get(i);
+                report.append("Disregarded Message ").append(i + 1).append(":\n");
+                report.append("   Hash: ").append(msg.messageHash).append("\n");
+                report.append("   Recipient: ").append(msg.recipientCell).append("\n");
+                report.append("   Message: ").append(msg.messageText).append("\n\n");
+            }
+        }
+        
+        // Show longest message
+        String longest = findLongestMessage();
+        if (!longest.isEmpty()) {
+            report.append("📏 LONGEST MESSAGE:\n");
+            report.append("-".repeat(50)).append("\n");
+            report.append("   \"").append(longest).append("\"\n");
+            report.append("   Length: ").append(longest.length()).append(" characters\n\n");
+        }
+        
+        report.append("=".repeat(50));
+        
+        // Create a scrollable text area for the report
+        javax.swing.JTextArea textArea = new javax.swing.JTextArea(report.toString());
+        textArea.setEditable(false);
+        textArea.setFont(new java.awt.Font(java.awt.Font.MONOSPACED, java.awt.Font.PLAIN, 12));
+        
+        javax.swing.JScrollPane scrollPane = new javax.swing.JScrollPane(textArea);
+        scrollPane.setPreferredSize(new java.awt.Dimension(600, 400));
+        
+        JOptionPane.showMessageDialog(null,
+            scrollPane,
+            "QuickChat - Comprehensive Report",
+            JOptionPane.INFORMATION_MESSAGE);
+    }
+    
+    /**
+     * Displays comprehensive report of all sent messages (Console version for testing)
      * Task 3.6: Implement comprehensive reporting
      * 
      * The following report formatting and data aggregation logic was developed 
@@ -486,94 +567,140 @@ public class Message {
     }
     
     /**
-     * Interactive search menu for testing Phase 3 features
-     * 
-     * The following interactive menu system and user input handling was developed 
-     * with assistance from Claude AI
-     * Anthropic. (2024). Claude (Version 3.5) [Large language model].
-     * https://claude.ai/
-     * Prompt: "Create an interactive console menu system with multiple options 
-     * for searching and managing data with proper input validation"
+     * Shows search and management menu using JOptionPane
      */
-    public static void showSearchMenu(Scanner scanner) {
+    public static void showSearchMenuGUI() {
         boolean searching = true;
         
         while (searching) {
-            System.out.println("\n🔍 SEARCH & MANAGEMENT MENU:");
-            System.out.println("1. Search by Message ID");
-            System.out.println("2. Search by Recipient");
-            System.out.println("3. Find Longest Message");
-            System.out.println("4. Delete Message by Hash");
-            System.out.println("5. Show Comprehensive Report");
-            System.out.println("6. Load Messages from JSON");
-            System.out.println("7. Back to Main Menu");
-            System.out.print("Enter your choice: ");
+            String[] searchOptions = {
+                "Search by Message ID",
+                "Search by Recipient",
+                "Find Longest Message",
+                "Delete Message by Hash",
+                "Show Comprehensive Report",
+                "Load Messages from JSON",
+                "Back to Main Menu"
+            };
             
-            int choice = scanner.nextInt();
-            scanner.nextLine(); // consume newline
+            int choice = JOptionPane.showOptionDialog(null,
+                "Search & Management Options:",
+                "QuickChat - Search Menu",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                searchOptions,
+                searchOptions[0]);
             
             switch (choice) {
-                case 1:
-                    System.out.print("Enter Message ID to search: ");
-                    String messageID = scanner.nextLine();
-                    String result = searchByMessageID(messageID);
-                    if (result != null) {
-                        System.out.println("Found message: \"" + result + "\"");
-                    } else {
-                        System.out.println("Message not found.");
-                    }
-                    break;
+                case 0: // Search by Message ID
+                    String messageID = JOptionPane.showInputDialog(null,
+                        "Enter Message ID to search:",
+                        "Search by Message ID",
+                        JOptionPane.QUESTION_MESSAGE);
                     
-                case 2:
-                    System.out.print("Enter recipient cell number: ");
-                    String recipient = scanner.nextLine();
-                    List<Message> messages = searchByRecipient(recipient);
-                    if (!messages.isEmpty()) {
-                        System.out.println("Found " + messages.size() + " message(s) for " + recipient + ":");
-                        for (int i = 0; i < messages.size(); i++) {
-                            System.out.printf("  %d. %s\n", i + 1, messages.get(i).messageText);
+                    if (messageID != null && !messageID.trim().isEmpty()) {
+                        String result = searchByMessageID(messageID);
+                        if (result != null) {
+                            JOptionPane.showMessageDialog(null,
+                                "Found message:\n\"" + result + "\"",
+                                "Search Result",
+                                JOptionPane.INFORMATION_MESSAGE);
+                        } else {
+                            JOptionPane.showMessageDialog(null,
+                                "Message not found.",
+                                "Search Result",
+                                JOptionPane.INFORMATION_MESSAGE);
                         }
-                    } else {
-                        System.out.println("No messages found for that recipient.");
                     }
                     break;
                     
-                case 3:
+                case 1: // Search by Recipient
+                    String recipient = JOptionPane.showInputDialog(null,
+                        "Enter recipient cell number:",
+                        "Search by Recipient",
+                        JOptionPane.QUESTION_MESSAGE);
+                    
+                    if (recipient != null && !recipient.trim().isEmpty()) {
+                        List<Message> messages = searchByRecipient(recipient);
+                        if (!messages.isEmpty()) {
+                            StringBuilder sb = new StringBuilder();
+                            sb.append("Found ").append(messages.size()).append(" message(s) for ").append(recipient).append(":\n\n");
+                            for (int i = 0; i < messages.size(); i++) {
+                                sb.append(i + 1).append(". ").append(messages.get(i).messageText).append("\n");
+                            }
+                            JOptionPane.showMessageDialog(null,
+                                sb.toString(),
+                                "Search Results",
+                                JOptionPane.INFORMATION_MESSAGE);
+                        } else {
+                            JOptionPane.showMessageDialog(null,
+                                "No messages found for that recipient.",
+                                "Search Result",
+                                JOptionPane.INFORMATION_MESSAGE);
+                        }
+                    }
+                    break;
+                    
+                case 2: // Find Longest Message
                     String longest = findLongestMessage();
                     if (!longest.isEmpty()) {
-                        System.out.println("Longest message: \"" + longest + "\"");
-                        System.out.println("Length: " + longest.length() + " characters");
+                        JOptionPane.showMessageDialog(null,
+                            "Longest message:\n\"" + longest + "\"\n\nLength: " + longest.length() + " characters",
+                            "Longest Message",
+                            JOptionPane.INFORMATION_MESSAGE);
                     } else {
-                        System.out.println("No messages found.");
+                        JOptionPane.showMessageDialog(null,
+                            "No messages found.",
+                            "Longest Message",
+                            JOptionPane.INFORMATION_MESSAGE);
                     }
                     break;
                     
-                case 4:
-                    System.out.print("Enter message hash to delete: ");
-                    String hash = scanner.nextLine();
-                    boolean deleted = deleteMessageByHash(hash);
-                    if (deleted) {
-                        System.out.println("Message successfully deleted.");
-                    } else {
-                        System.out.println("Message with that hash not found.");
+                case 3: // Delete Message by Hash
+                    String hash = JOptionPane.showInputDialog(null,
+                        "Enter message hash to delete:",
+                        "Delete Message",
+                        JOptionPane.QUESTION_MESSAGE);
+                    
+                    if (hash != null && !hash.trim().isEmpty()) {
+                        boolean deleted = deleteMessageByHash(hash);
+                        if (deleted) {
+                            JOptionPane.showMessageDialog(null,
+                                "Message successfully deleted.",
+                                "Delete Result",
+                                JOptionPane.INFORMATION_MESSAGE);
+                        } else {
+                            JOptionPane.showMessageDialog(null,
+                                "Message with that hash not found.",
+                                "Delete Result",
+                                JOptionPane.WARNING_MESSAGE);
+                        }
                     }
                     break;
                     
-                case 5:
-                    displayComprehensiveReport();
+                case 4: // Show Comprehensive Report
+                    displayComprehensiveReportGUI();
                     break;
                     
-                case 6:
+                case 5: // Load Messages from JSON
                     loadFromJSON();
-                    System.out.println("Messages loaded from JSON file.");
+                    JOptionPane.showMessageDialog(null,
+                        "Messages loaded from JSON file.",
+                        "Load Complete",
+                        JOptionPane.INFORMATION_MESSAGE);
                     break;
                     
-                case 7:
+                case 6: // Back to Main Menu
+                case JOptionPane.CLOSED_OPTION:
                     searching = false;
                     break;
                     
                 default:
-                    System.out.println("Invalid choice. Please try again.");
+                    JOptionPane.showMessageDialog(null,
+                        "Invalid choice. Please try again.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
             }
         }
     }
@@ -581,96 +708,159 @@ public class Message {
     // ========== END PHASE 3 FEATURES ==========
     
     /**
-     * Main application menu
+     * Main application menu using JOptionPane
      */
     public static void showMainMenu() {
-        Scanner scanner = new Scanner(System.in);
         boolean running = true;
         
-        System.out.println("Welcome to QuickChat");
+        JOptionPane.showMessageDialog(null, 
+            "Welcome to QuickChat!", 
+            "QuickChat Application", 
+            JOptionPane.INFORMATION_MESSAGE);
         
         while (running) {
-            System.out.println("\nPlease select an option:");
-            System.out.println("1. Send Messages");
-            System.out.println("2. Search & Management (Phase 3 Features)");
-            System.out.println("3. Show Comprehensive Report");
-            System.out.println("4. Quit");
-            System.out.print("Enter your choice: ");
+            String[] options = {
+                "Send Messages",
+                "Search & Management (Phase 3 Features)", 
+                "Show Comprehensive Report",
+                "Quit"
+            };
             
-            int choice = scanner.nextInt();
-            scanner.nextLine(); // consume newline
+            int choice = JOptionPane.showOptionDialog(null,
+                "Please select an option:",
+                "QuickChat - Main Menu",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                options,
+                options[0]);
             
             switch (choice) {
+                case 0:
+                    handleSendMessagesGUI();
+                    break;
                 case 1:
-                    handleSendMessages(scanner);
+                    showSearchMenuGUI();
                     break;
                 case 2:
-                    showSearchMenu(scanner);
+                    displayComprehensiveReportGUI();
                     break;
                 case 3:
-                    displayComprehensiveReport();
-                    break;
-                case 4:
-                    System.out.println("Thank you for using QuickChat!");
+                case JOptionPane.CLOSED_OPTION:
+                    JOptionPane.showMessageDialog(null, 
+                        "Thank you for using QuickChat!", 
+                        "Goodbye", 
+                        JOptionPane.INFORMATION_MESSAGE);
                     running = false;
                     break;
                 default:
-                    System.out.println("Invalid choice. Please try again.");
+                    JOptionPane.showMessageDialog(null, 
+                        "Invalid choice. Please try again.", 
+                        "Error", 
+                        JOptionPane.ERROR_MESSAGE);
             }
         }
-        scanner.close();
     }
     
     /**
-     * Handles the send messages workflow
+     * Handles the send messages workflow using JOptionPane
      */
-    private static void handleSendMessages(Scanner scanner) {
-        System.out.print("How many messages would you like to send? ");
-        int numMessages = scanner.nextInt();
-        scanner.nextLine(); // consume newline
+    private static void handleSendMessagesGUI() {
+        String input = JOptionPane.showInputDialog(null,
+            "How many messages would you like to send?",
+            "Send Messages",
+            JOptionPane.QUESTION_MESSAGE);
         
-        for (int i = 0; i < numMessages; i++) {
-            System.out.printf("\n--- Message %d ---\n", i + 1);
+        if (input == null) return; // User cancelled
+        
+        try {
+            int numMessages = Integer.parseInt(input);
             
-            // Get recipient
-            String recipient;
-            while (true) {
-                System.out.print("Enter recipient cell number: ");
-                recipient = scanner.nextLine();
-                Message tempMsg = new Message();
-                String validation = tempMsg.checkRecipientCell(recipient);
-                if (validation.contains("successfully")) {
-                    break;
-                } else {
-                    System.out.println(validation);
-                }
+            if (numMessages <= 0) {
+                JOptionPane.showMessageDialog(null,
+                    "Please enter a positive number.",
+                    "Invalid Input",
+                    JOptionPane.ERROR_MESSAGE);
+                return;
             }
             
-            // Get message text
-            String messageText;
-            while (true) {
-                System.out.print("Enter your message: ");
-                messageText = scanner.nextLine();
-                Message tempMsg = new Message();
-                String validation = tempMsg.checkMessageLength(messageText);
-                if (validation.equals("Message ready to send")) {
-                    break;
-                } else {
-                    System.out.println(validation);
+            for (int i = 0; i < numMessages; i++) {
+                // Get recipient
+                String recipient;
+                while (true) {
+                    recipient = JOptionPane.showInputDialog(null,
+                        String.format("Message %d of %d\nEnter recipient cell number:", i + 1, numMessages),
+                        "Recipient Information",
+                        JOptionPane.QUESTION_MESSAGE);
+                    
+                    if (recipient == null) return; // User cancelled
+                    
+                    Message tempMsg = new Message();
+                    String validation = tempMsg.checkRecipientCell(recipient);
+                    if (validation.contains("successfully")) {
+                        break;
+                    } else {
+                        JOptionPane.showMessageDialog(null,
+                            validation,
+                            "Invalid Phone Number",
+                            JOptionPane.ERROR_MESSAGE);
+                    }
                 }
+                
+                // Get message text
+                String messageText;
+                while (true) {
+                    messageText = JOptionPane.showInputDialog(null,
+                        String.format("Message %d of %d\nRecipient: %s\nEnter your message:", i + 1, numMessages, recipient),
+                        "Message Content",
+                        JOptionPane.QUESTION_MESSAGE);
+                    
+                    if (messageText == null) return; // User cancelled
+                    
+                    Message tempMsg = new Message();
+                    String validation = tempMsg.checkMessageLength(messageText);
+                    if (validation.equals("Message ready to send")) {
+                        break;
+                    } else {
+                        JOptionPane.showMessageDialog(null,
+                            validation,
+                            "Message Too Long",
+                            JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+                
+                // Create message
+                Message message = new Message(recipient, messageText, i);
+                
+                // Show message details
+                message.displayMessage();
+                
+                // Get action
+                String[] actionOptions = {"Send", "Store", "Disregard"};
+                int actionChoice = JOptionPane.showOptionDialog(null,
+                    "What would you like to do with this message?",
+                    "Message Action",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    actionOptions,
+                    actionOptions[0]);
+                
+                if (actionChoice == JOptionPane.CLOSED_OPTION) return; // User cancelled
+                
+                String action = actionOptions[actionChoice];
+                String result = message.sentMessage(action);
+                JOptionPane.showMessageDialog(null,
+                    result,
+                    "Action Result",
+                    JOptionPane.INFORMATION_MESSAGE);
             }
             
-            // Create message
-            Message message = new Message(recipient, messageText, i);
-            
-            // Show message details
-            message.displayMessage();
-            
-            // Get action
-            System.out.print("What would you like to do? (Send/Store/Disregard): ");
-            String action = scanner.nextLine();
-            String result = message.sentMessage(action);
-            System.out.println(result);
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null,
+                "Please enter a valid number.",
+                "Invalid Input",
+                JOptionPane.ERROR_MESSAGE);
         }
     }
     
