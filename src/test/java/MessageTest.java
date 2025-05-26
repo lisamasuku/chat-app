@@ -228,7 +228,7 @@ public class MessageTest {
         Message testMessage = new Message("+27838968976", "", 0);
         String hash = testMessage.getMessageHash();
         
-        String[] parts = hash.split(":");
+        String[] parts = hash.split(":", -1); // Use -1 to preserve trailing empty strings
         assertEquals(3, parts.length);
         assertEquals("0", parts[1]);
         assertEquals("", parts[2]); // empty first and last words
