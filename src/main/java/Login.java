@@ -49,8 +49,8 @@ public class Login {
      * The following password validation logic was developed with assistance from Claude AI
      * Anthropic. (2024). Claude (Version 3.5) [Large language model].
      * https://claude.ai/
-     * Prompt: "Create a method to validate password complexity checking for minimum length, 
-     * uppercase letters, numbers, and special characters using character iteration"
+     * Prompt: "help me check if a password is strong enough - needs 8 chars, uppercase, 
+     * number and special character. how do i loop through each character to check?"
      * 
      * @param password The password to validate
      * @return true if password meets complexity requirements, false otherwise
@@ -115,8 +115,8 @@ public class Login {
          * The following regular expression was generated using Claude AI
          * Anthropic. (2024). Claude (Version 3.5) [Large language model].
          * https://claude.ai/
-         * Prompt: "Create a regex for South African phone numbers that start with +27 
-         * and have no more than 10 total characters including the country code"
+         * Prompt: "i need regex for south african phone numbers +27 something, 
+         * but max 10 chars total. regex is confusing help!"
          */
         
         // Check if phone number is null or empty

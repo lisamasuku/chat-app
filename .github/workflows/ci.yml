@@ -1,6 +1,7 @@
 # AI Attribution: This CI/CD pipeline configuration was developed with assistance from Claude AI
 # Anthropic. (2024). Claude (Version 3.5) [Large language model]. https://claude.ai/
-# Prompt: "Create a comprehensive GitHub Actions workflow for Java Maven project with testing, coverage, and artifact generation"
+# Prompt: "github actions is confusing, help me set up automatic testing for my java maven project. 
+# want it to run tests and make reports when i push code"
 
 name: QuickChat CI/CD Pipeline
 

@@ -110,8 +110,8 @@ public class Message {
      * with assistance from Claude AI
      * Anthropic. (2024). Claude (Version 3.5) [Large language model].
      * https://claude.ai/
-     * Prompt: "Create a method to generate a hash from message ID, number, and first/last 
-     * words using string manipulation and array splitting"
+     * Prompt: "how do i make a hash like XX:Y:FIRSTLAST from message id and text? 
+     * need to split words and get first/last ones"
      * 
      * @return the generated hash
      */
@@ -171,8 +171,8 @@ public class Message {
      * The following JSON serialization method was developed with assistance from Claude AI
      * Anthropic. (2024). Claude (Version 3.5) [Large language model].
      * https://claude.ai/
-     * Prompt: "Create a method to save Java objects to JSON file using Gson library 
-     * with proper error handling and pretty printing"
+     * Prompt: "gson is confusing me, how do i save my java objects to a json file? 
+     * want it to look nice and handle errors properly"
      */
     private void saveToJSON() {
         try {
@@ -422,8 +422,8 @@ public class Message {
      * with assistance from Claude AI
      * Anthropic. (2024). Claude (Version 3.5) [Large language model].
      * https://claude.ai/
-     * Prompt: "Create a comprehensive reporting method that displays formatted 
-     * statistics and details for multiple message collections with visual separators"
+     * Prompt: "need to make a nice looking report that shows all my messages with 
+     * stats and stuff. how do i format it so it looks professional?"
      */
     public static void displayComprehensiveReport() {
         System.out.println("\n" + "=".repeat(50));
