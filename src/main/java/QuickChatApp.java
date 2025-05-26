@@ -26,8 +26,15 @@ public class QuickChatApp {
      * Shows the welcome screen and handles authentication
      */
     private static void showWelcomeScreen() {
+        // Show user count if any users are registered
+        int userCount = Login.getTotalRegisteredUsers();
+        String welcomeMessage = "Welcome to QuickChat!\n\nYou must register and login to use the messaging system.";
+        if (userCount > 0) {
+            welcomeMessage += "\n\n" + userCount + " user(s) already registered.";
+        }
+        
         JOptionPane.showMessageDialog(null, 
-            "Welcome to QuickChat!\n\nYou must register and login to use the messaging system.", 
+            welcomeMessage, 
             "QuickChat - Welcome", 
             JOptionPane.INFORMATION_MESSAGE);
         
@@ -51,9 +58,7 @@ public class QuickChatApp {
             
             switch (choice) {
                 case 0:
-                    if (handleRegistration()) {
-                        authenticated = handleLogin();
-                    }
+                    handleRegistration();
                     break;
                 case 1:
                     authenticated = handleLogin();
@@ -79,9 +84,8 @@ public class QuickChatApp {
     
     /**
      * Handles user registration process
-     * @return true if registration successful, false otherwise
      */
-    private static boolean handleRegistration() {
+    private static void handleRegistration() {
         // Get first and last name for personalized welcome
         String firstName = JOptionPane.showInputDialog(null,
             "Enter your first name:",
@@ -89,7 +93,7 @@ public class QuickChatApp {
             JOptionPane.QUESTION_MESSAGE);
         
         if (firstName == null || firstName.trim().isEmpty()) {
-            return false; // User cancelled or entered empty name
+            return; // User cancelled or entered empty name
         }
         
         String lastName = JOptionPane.showInputDialog(null,
@@ -98,11 +102,11 @@ public class QuickChatApp {
             JOptionPane.QUESTION_MESSAGE);
         
         if (lastName == null || lastName.trim().isEmpty()) {
-            return false; // User cancelled or entered empty name
+            return; // User cancelled or entered empty name
         }
         
         // Create login instance with user names
-        currentUser = new Login(firstName.trim(), lastName.trim());
+        Login newUser = new Login(firstName.trim(), lastName.trim());
         
         // Get username with validation
         String username;
@@ -111,14 +115,15 @@ public class QuickChatApp {
                 "Create a username:\n\n" +
                 "Requirements:\n" +
                 "• Must contain an underscore (_)\n" +
-                "• Maximum 5 characters\n\n" +
+                "• Maximum 5 characters\n" +
+                "• Must be unique\n\n" +
                 "Example: kyl_1",
                 "Registration - Username",
                 JOptionPane.QUESTION_MESSAGE);
             
-            if (username == null) return false; // User cancelled
+            if (username == null) return; // User cancelled
             
-            if (currentUser.checkUserName(username)) {
+            if (newUser.checkUserName(username)) {
                 break;
             } else {
                 JOptionPane.showMessageDialog(null,
@@ -142,9 +147,9 @@ public class QuickChatApp {
                 "Registration - Password",
                 JOptionPane.QUESTION_MESSAGE);
             
-            if (password == null) return false; // User cancelled
+            if (password == null) return; // User cancelled
             
-            if (currentUser.checkPasswordComplexity(password)) {
+            if (newUser.checkPasswordComplexity(password)) {
                 break;
             } else {
                 JOptionPane.showMessageDialog(null,
@@ -166,9 +171,9 @@ public class QuickChatApp {
                 "Registration - Cell Phone",
                 JOptionPane.QUESTION_MESSAGE);
             
-            if (cellPhone == null) return false; // User cancelled
+            if (cellPhone == null) return; // User cancelled
             
-            if (currentUser.checkCellPhoneNumber(cellPhone)) {
+            if (newUser.checkCellPhoneNumber(cellPhone)) {
                 break;
             } else {
                 JOptionPane.showMessageDialog(null,
@@ -179,20 +184,18 @@ public class QuickChatApp {
         }
         
         // Register the user
-        String registrationResult = currentUser.registerUser(username, password, cellPhone);
+        String registrationResult = newUser.registerUser(username, password, cellPhone);
         
         if (registrationResult.contains("successfully")) {
             JOptionPane.showMessageDialog(null,
-                "Registration successful!\n\nYou can now login with your credentials.",
+                "Registration successful!\n\nYour account has been saved.\nYou can now login with your credentials.",
                 "Registration Complete",
                 JOptionPane.INFORMATION_MESSAGE);
-            return true;
         } else {
             JOptionPane.showMessageDialog(null,
                 "Registration failed: " + registrationResult,
                 "Registration Error",
                 JOptionPane.ERROR_MESSAGE);
-            return false;
         }
     }
     
@@ -201,9 +204,10 @@ public class QuickChatApp {
      * @return true if login successful, false otherwise
      */
     private static boolean handleLogin() {
-        if (currentUser == null) {
+        // Check if any users are registered
+        if (Login.getTotalRegisteredUsers() == 0) {
             JOptionPane.showMessageDialog(null,
-                "No user account found. Please register first.",
+                "No user accounts found. Please register first.",
                 "Login Error",
                 JOptionPane.ERROR_MESSAGE);
             return false;
@@ -224,11 +228,14 @@ public class QuickChatApp {
         
         if (password == null) return false; // User cancelled
         
-        // Attempt login
-        boolean loginSuccess = currentUser.loginUser(username, password);
-        String loginMessage = currentUser.returnLoginStatus(loginSuccess);
+        // Attempt login using static method
+        boolean loginSuccess = Login.authenticateUser(username, password);
         
         if (loginSuccess) {
+            // Get user details for welcome message
+            currentUser = Login.getUserByUsername(username);
+            String loginMessage = currentUser.returnLoginStatus(true);
+            
             JOptionPane.showMessageDialog(null,
                 loginMessage,
                 "Login Successful",
@@ -236,7 +243,7 @@ public class QuickChatApp {
             return true;
         } else {
             JOptionPane.showMessageDialog(null,
-                loginMessage,
+                "Username or password incorrect, please try again.",
                 "Login Failed",
                 JOptionPane.ERROR_MESSAGE);
             return false;

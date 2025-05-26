@@ -180,6 +180,12 @@ public class Message {
      */
     private void saveToJSON() {
         try {
+            // Ensure data directory exists
+            java.io.File dataDir = new java.io.File("data");
+            if (!dataDir.exists()) {
+                dataDir.mkdirs();
+            }
+            
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             FileWriter writer = new FileWriter("data/stored_messages.json");
             gson.toJson(storedMessages, writer);
@@ -412,8 +418,22 @@ public class Message {
      */
     public static void loadFromJSON() {
         try {
+            // Ensure data directory exists
+            java.io.File dataDir = new java.io.File("data");
+            if (!dataDir.exists()) {
+                dataDir.mkdirs();
+            }
+            
+            java.io.File jsonFile = new java.io.File("data/stored_messages.json");
+            if (!jsonFile.exists()) {
+                // Create empty JSON file if it doesn't exist
+                try (java.io.FileWriter writer = new java.io.FileWriter(jsonFile)) {
+                    writer.write("[]");
+                }
+            }
+            
             Gson gson = new Gson();
-            FileReader reader = new FileReader("data/stored_messages.json");
+            FileReader reader = new FileReader(jsonFile);
             Type listType = new TypeToken<List<Message>>(){}.getType();
             List<Message> loadedMessages = gson.fromJson(reader, listType);
             reader.close();
@@ -425,8 +445,10 @@ public class Message {
             }
         } catch (IOException e) {
             System.err.println("Error loading from JSON: " + e.getMessage());
+            throw new RuntimeException("Failed to load messages from JSON file: " + e.getMessage());
         } catch (Exception e) {
-            System.err.println("JSON file not found or empty, starting with empty stored messages");
+            System.err.println("JSON parsing error: " + e.getMessage());
+            throw new RuntimeException("Failed to parse JSON file: " + e.getMessage());
         }
     }
     
@@ -579,32 +601,78 @@ public class Message {
     }
     
     /**
-     * Shows search and management menu using JOptionPane
+     * Shows search and management menu using custom JPanel with 2-row layout
      */
     public static void showSearchMenuGUI() {
         boolean searching = true;
         
         while (searching) {
-            String[] searchOptions = {
-                "Search by Message ID",
-                "Search by Recipient",
-                "Find Longest Message",
-                "Delete Message by Hash",
-                "Show Comprehensive Report",
-                "Load Messages from JSON",
-                "Back to Main Menu"
-            };
+            // Create custom panel with GridLayout for 2 rows
+            javax.swing.JPanel panel = new javax.swing.JPanel();
+            panel.setLayout(new java.awt.GridLayout(3, 1, 10, 10));
+            panel.setBorder(javax.swing.BorderFactory.createEmptyBorder(20, 20, 20, 20));
             
-            int choice = JOptionPane.showOptionDialog(null,
-                "Search & Management Options:",
-                "QuickChat - Search Menu",
-                JOptionPane.DEFAULT_OPTION,
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                searchOptions,
-                searchOptions[0]);
+            // Add title label
+            javax.swing.JLabel titleLabel = new javax.swing.JLabel("Search & Management Options", javax.swing.SwingConstants.CENTER);
+            titleLabel.setFont(new java.awt.Font(java.awt.Font.SANS_SERIF, java.awt.Font.BOLD, 16));
+            panel.add(titleLabel);
             
-            switch (choice) {
+            // Create button panel with 2 rows
+            javax.swing.JPanel buttonPanel = new javax.swing.JPanel();
+            buttonPanel.setLayout(new java.awt.GridLayout(2, 3, 10, 10));
+            
+            // Create buttons for first row
+            javax.swing.JButton searchByIdBtn = new javax.swing.JButton("Search by Message ID");
+            javax.swing.JButton searchByRecipientBtn = new javax.swing.JButton("Search by Recipient");
+            javax.swing.JButton findLongestBtn = new javax.swing.JButton("Find Longest Message");
+            
+            // Create buttons for second row
+            javax.swing.JButton deleteByHashBtn = new javax.swing.JButton("Delete Message by Hash");
+            javax.swing.JButton showReportBtn = new javax.swing.JButton("Show Comprehensive Report");
+            javax.swing.JButton loadJsonBtn = new javax.swing.JButton("Load Messages from JSON");
+            
+            // Add buttons to button panel
+            buttonPanel.add(searchByIdBtn);
+            buttonPanel.add(searchByRecipientBtn);
+            buttonPanel.add(findLongestBtn);
+            buttonPanel.add(deleteByHashBtn);
+            buttonPanel.add(showReportBtn);
+            buttonPanel.add(loadJsonBtn);
+            
+            panel.add(buttonPanel);
+            
+            // Create back button panel
+            javax.swing.JPanel backPanel = new javax.swing.JPanel();
+            javax.swing.JButton backBtn = new javax.swing.JButton("Back to Main Menu");
+            backBtn.setPreferredSize(new java.awt.Dimension(200, 30));
+            backPanel.add(backBtn);
+            panel.add(backPanel);
+            
+            // Create dialog
+            javax.swing.JDialog dialog = new javax.swing.JDialog();
+            dialog.setTitle("QuickChat - Search & Management Menu");
+            dialog.setModal(true);
+            dialog.setDefaultCloseOperation(javax.swing.JDialog.DISPOSE_ON_CLOSE);
+            dialog.add(panel);
+            dialog.pack();
+            dialog.setLocationRelativeTo(null);
+            
+            // Track which button was clicked
+            final int[] choice = {-1};
+            
+            // Add action listeners
+            searchByIdBtn.addActionListener(e -> { choice[0] = 0; dialog.dispose(); });
+            searchByRecipientBtn.addActionListener(e -> { choice[0] = 1; dialog.dispose(); });
+            findLongestBtn.addActionListener(e -> { choice[0] = 2; dialog.dispose(); });
+            deleteByHashBtn.addActionListener(e -> { choice[0] = 3; dialog.dispose(); });
+            showReportBtn.addActionListener(e -> { choice[0] = 4; dialog.dispose(); });
+            loadJsonBtn.addActionListener(e -> { choice[0] = 5; dialog.dispose(); });
+            backBtn.addActionListener(e -> { choice[0] = 6; dialog.dispose(); });
+            
+            // Show dialog
+            dialog.setVisible(true);
+            
+            switch (choice[0]) {
                 case 0: // Search by Message ID
                     String messageID = JOptionPane.showInputDialog(null,
                         "Enter Message ID to search:",
@@ -696,23 +764,29 @@ public class Message {
                     break;
                     
                 case 5: // Load Messages from JSON
-                    loadFromJSON();
-                    JOptionPane.showMessageDialog(null,
-                        "Messages loaded from JSON file.",
-                        "Load Complete",
-                        JOptionPane.INFORMATION_MESSAGE);
+                    try {
+                        loadFromJSON();
+                        JOptionPane.showMessageDialog(null,
+                            "Messages loaded from JSON file successfully.\n" +
+                            "Loaded " + storedMessages.size() + " stored messages.",
+                            "Load Complete",
+                            JOptionPane.INFORMATION_MESSAGE);
+                    } catch (Exception e) {
+                        JOptionPane.showMessageDialog(null,
+                            "Error loading messages from JSON:\n" + e.getMessage(),
+                            "Load Error",
+                            JOptionPane.ERROR_MESSAGE);
+                    }
                     break;
                     
                 case 6: // Back to Main Menu
-                case JOptionPane.CLOSED_OPTION:
+                case -1: // Dialog closed without selection
                     searching = false;
                     break;
                     
                 default:
-                    JOptionPane.showMessageDialog(null,
-                        "Invalid choice. Please try again.",
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE);
+                    // This shouldn't happen with the new button-based interface
+                    searching = false;
             }
         }
     }

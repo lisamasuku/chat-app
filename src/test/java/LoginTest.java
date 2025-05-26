@@ -15,6 +15,8 @@ public class LoginTest {
     
     @BeforeEach
     public void setUp() {
+        // Clear all users before each test to ensure clean state
+        Login.clearAllUsers();
         login = new Login("John", "Doe");
     }
     

@@ -1,6 +1,16 @@
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+import java.io.FileWriter;
+import java.io.FileReader;
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Login class for QuickChat application
- * Handles user registration and authentication
+ * Handles user registration and authentication with persistent JSON storage
  * 
  * @author Your Name
  * @version 1.0
@@ -13,6 +23,9 @@ public class Login {
     private String cellPhoneNumber;
     private String firstName;
     private String lastName;
+    
+    // Static list to store all registered users
+    private static List<Login> registeredUsers = new ArrayList<>();
     
     // Default constructor
     public Login() {
@@ -133,7 +146,7 @@ public class Login {
     }
     
     /**
-     * Registers a new user
+     * Registers a new user with persistent storage
      * Combines all validations and returns appropriate messages
      * 
      * @param username The username
@@ -142,6 +155,14 @@ public class Login {
      * @return Registration status message
      */
     public String registerUser(String username, String password, String cellPhoneNumber) {
+        // Load existing users first
+        loadUsersFromJSON();
+        
+        // Check if username already exists
+        if (isUsernameExists(username)) {
+            return "Username already exists. Please choose a different username.";
+        }
+        
         // Validate username
         if (!checkUserName(username)) {
             return "Username is not correctly formatted, please ensure that your username contains an underscore and is no more than five characters in length.";
@@ -157,30 +178,64 @@ public class Login {
             return "Cell phone number incorrectly formatted or does not contain international code.";
         }
         
-        // If all validations pass, store the user credentials and return success
+        // If all validations pass, store the user credentials
         this.username = username;
         this.password = password;
         this.cellPhoneNumber = cellPhoneNumber;
+        
+        // Add to registered users list and save to JSON
+        registeredUsers.add(this);
+        saveUsersToJSON();
         
         return "User registered successfully.";
     }
     
     /**
-     * Authenticates user login
+     * Authenticates user login against stored users
      * Verifies that login details match stored credentials
      * 
      * @param username The username
      * @param password The password
      * @return true if login successful, false otherwise
      */
-    public boolean loginUser(String username, String password) {
-        // Check if user has been registered (credentials are stored)
-        if (this.username == null || this.password == null) {
-            return false;
+    public static boolean authenticateUser(String username, String password) {
+        // Load users from JSON
+        loadUsersFromJSON();
+        
+        // Search for user with matching credentials
+        for (Login user : registeredUsers) {
+            if (user.username.equals(username) && user.password.equals(password)) {
+                return true;
+            }
         }
         
-        // Verify that provided credentials match stored credentials
-        return this.username.equals(username) && this.password.equals(password);
+        return false;
+    }
+    
+    /**
+     * Gets user details for successful login
+     * @param username The username to find
+     * @return Login object if found, null otherwise
+     */
+    public static Login getUserByUsername(String username) {
+        loadUsersFromJSON();
+        
+        for (Login user : registeredUsers) {
+            if (user.username.equals(username)) {
+                return user;
+            }
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Legacy method for backward compatibility
+     * @deprecated Use authenticateUser(String, String) instead
+     */
+    @Deprecated
+    public boolean loginUser(String username, String password) {
+        return authenticateUser(username, password);
     }
     
     /**
@@ -236,5 +291,95 @@ public class Login {
     
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+    
+    // ========== JSON STORAGE METHODS ==========
+    
+    /**
+     * Saves all registered users to JSON file
+     */
+    private static void saveUsersToJSON() {
+        try {
+            // Ensure data directory exists
+            java.io.File dataDir = new java.io.File("data");
+            if (!dataDir.exists()) {
+                dataDir.mkdirs();
+            }
+            
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            FileWriter writer = new FileWriter("data/users.json");
+            gson.toJson(registeredUsers, writer);
+            writer.close();
+        } catch (IOException e) {
+            System.err.println("Error saving users to JSON: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Loads registered users from JSON file
+     */
+    private static void loadUsersFromJSON() {
+        try {
+            // Ensure data directory exists
+            java.io.File dataDir = new java.io.File("data");
+            if (!dataDir.exists()) {
+                dataDir.mkdirs();
+            }
+            
+            java.io.File jsonFile = new java.io.File("data/users.json");
+            if (!jsonFile.exists()) {
+                // Create empty JSON file if it doesn't exist
+                try (java.io.FileWriter writer = new java.io.FileWriter(jsonFile)) {
+                    writer.write("[]");
+                }
+                return;
+            }
+            
+            Gson gson = new Gson();
+            FileReader reader = new FileReader(jsonFile);
+            Type listType = new TypeToken<List<Login>>(){}.getType();
+            List<Login> loadedUsers = gson.fromJson(reader, listType);
+            reader.close();
+            
+            if (loadedUsers != null) {
+                registeredUsers.clear();
+                registeredUsers.addAll(loadedUsers);
+            }
+        } catch (IOException e) {
+            System.err.println("Error loading users from JSON: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("JSON parsing error for users: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Checks if a username already exists
+     * @param username The username to check
+     * @return true if username exists, false otherwise
+     */
+    private static boolean isUsernameExists(String username) {
+        for (Login user : registeredUsers) {
+            if (user.username.equals(username)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Gets the total number of registered users
+     * @return number of registered users
+     */
+    public static int getTotalRegisteredUsers() {
+        loadUsersFromJSON();
+        return registeredUsers.size();
+    }
+    
+    /**
+     * Clears all registered users (for testing purposes)
+     */
+    public static void clearAllUsers() {
+        registeredUsers.clear();
+        saveUsersToJSON();
     }
 } 
