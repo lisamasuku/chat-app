@@ -190,14 +190,26 @@ public class Message {
     }
     
     /**
-     * Displays message details using JOptionPane
+     * Displays message details using JOptionPane with improved formatting
      */
     public void displayMessage() {
         String details = String.format(
-            "Message ID: %s\nHash: %s\nRecipient: %s\nMessage: %s",
+            "Message Details:\n\n" +
+            "Message ID: %s\n" +
+            "Hash: %s\n" +
+            "Recipient: %s\n" +
+            "Message: %s",
             messageID, messageHash, recipientCell, messageText
         );
-        JOptionPane.showMessageDialog(null, details, "Message Details", JOptionPane.INFORMATION_MESSAGE);
+        
+        // Create a text area for better display of longer messages
+        javax.swing.JTextArea textArea = new javax.swing.JTextArea(details);
+        textArea.setEditable(false);
+        textArea.setFont(new java.awt.Font(java.awt.Font.MONOSPACED, java.awt.Font.PLAIN, 12));
+        textArea.setRows(6);
+        textArea.setColumns(40);
+        
+        JOptionPane.showMessageDialog(null, textArea, "Message Details", JOptionPane.INFORMATION_MESSAGE);
     }
     
     /**
@@ -487,7 +499,7 @@ public class Message {
         textArea.setFont(new java.awt.Font(java.awt.Font.MONOSPACED, java.awt.Font.PLAIN, 12));
         
         javax.swing.JScrollPane scrollPane = new javax.swing.JScrollPane(textArea);
-        scrollPane.setPreferredSize(new java.awt.Dimension(600, 400));
+        scrollPane.setPreferredSize(new java.awt.Dimension(700, 500));
         
         JOptionPane.showMessageDialog(null,
             scrollPane,
@@ -721,8 +733,8 @@ public class Message {
         while (running) {
             String[] options = {
                 "Send Messages",
-                "Search & Management (Phase 3 Features)", 
-                "Show Comprehensive Report",
+                "Message Management", 
+                "View Reports",
                 "Quit"
             };
             
