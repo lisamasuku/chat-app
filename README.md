@@ -1,10 +1,7 @@
 # QuickChat Application - Portfolio of Evidence Submission
 
-**Student Name**: [Your Name]  
-**Student Number**: [Your Student Number]  
 **Module**: PROGRAMMING 1A (PROG5121/p/w)  
 **Institution**: The Independent Institute of Education  
-**Submission Date**: [Current Date]
 
 ---
 
