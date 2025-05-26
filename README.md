@@ -9,6 +9,8 @@
 
 QuickChat is a comprehensive Java-based messaging application that demonstrates mastery of fundamental programming concepts including object-oriented programming, data validation, file I/O operations, and automated testing. This Portfolio of Evidence (PoE) showcases the complete software development lifecycle from requirements analysis through deployment, incorporating modern development practices including version control, continuous integration, and ethical AI usage.
 
+**AI Attribution for Documentation**: This README document was structured and formatted with assistance from Claude AI (Anthropic, 2024) to ensure professional presentation and comprehensive coverage of technical achievements.
+
 ## 🎯 Project Achievements
 
 ### ✅ **Part 1: Registration and Login System (45/45 marks)**

@@ -11,7 +11,8 @@
     <packaging>jar</packaging>
 
     <name>QuickChat Application</name>
-    <description>A Java-based chat application demonstrating OOP principles, validation, and testing</description>
+    <description>A Java-based chat application demonstrating OOP principles, validation, and testing.
+                 AI Attribution: Maven configuration developed with assistance from Claude AI (Anthropic, 2024).</description>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>

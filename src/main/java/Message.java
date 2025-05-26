@@ -105,6 +105,14 @@ public class Message {
     
     /**
      * Creates message hash in format XX:Y:FIRSTLAST
+     * 
+     * The following string manipulation logic for hash generation was developed 
+     * with assistance from Claude AI
+     * Anthropic. (2024). Claude (Version 3.5) [Large language model].
+     * https://claude.ai/
+     * Prompt: "Create a method to generate a hash from message ID, number, and first/last 
+     * words using string manipulation and array splitting"
+     * 
      * @return the generated hash
      */
     public String createMessageHash() {
@@ -159,7 +167,12 @@ public class Message {
     
     /**
      * Saves stored messages to JSON file
-     * AI-assisted method for JSON handling
+     * 
+     * The following JSON serialization method was developed with assistance from Claude AI
+     * Anthropic. (2024). Claude (Version 3.5) [Large language model].
+     * https://claude.ai/
+     * Prompt: "Create a method to save Java objects to JSON file using Gson library 
+     * with proper error handling and pretty printing"
      */
     private void saveToJSON() {
         try {
@@ -374,7 +387,12 @@ public class Message {
     /**
      * Loads stored messages from JSON file
      * Task 3.7: Integrate JSON reading (AI-assisted)
-     * AI Attribution: This method uses Gson library for JSON deserialization
+     * 
+     * The following JSON deserialization method was developed with assistance from Claude AI
+     * Anthropic. (2024). Claude (Version 3.5) [Large language model].
+     * https://claude.ai/
+     * Prompt: "Create a method to read JSON file back into Java objects using Gson library 
+     * with TypeToken for generic lists and proper error handling"
      */
     public static void loadFromJSON() {
         try {
@@ -399,6 +417,13 @@ public class Message {
     /**
      * Displays comprehensive report of all sent messages
      * Task 3.6: Implement comprehensive reporting
+     * 
+     * The following report formatting and data aggregation logic was developed 
+     * with assistance from Claude AI
+     * Anthropic. (2024). Claude (Version 3.5) [Large language model].
+     * https://claude.ai/
+     * Prompt: "Create a comprehensive reporting method that displays formatted 
+     * statistics and details for multiple message collections with visual separators"
      */
     public static void displayComprehensiveReport() {
         System.out.println("\n" + "=".repeat(50));
@@ -462,6 +487,13 @@ public class Message {
     
     /**
      * Interactive search menu for testing Phase 3 features
+     * 
+     * The following interactive menu system and user input handling was developed 
+     * with assistance from Claude AI
+     * Anthropic. (2024). Claude (Version 3.5) [Large language model].
+     * https://claude.ai/
+     * Prompt: "Create an interactive console menu system with multiple options 
+     * for searching and managing data with proper input validation"
      */
     public static void showSearchMenu(Scanner scanner) {
         boolean searching = true;

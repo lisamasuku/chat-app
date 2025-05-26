@@ -1,5 +1,7 @@
 # QuickChat Application - Quick Start Guide
 
+**AI Attribution**: This technical guide was developed with assistance from Claude AI (Anthropic, 2024) to provide comprehensive setup instructions and troubleshooting guidance.
+
 ## 🚀 Prerequisites
 
 Before running the QuickChat application, ensure you have the following installed:

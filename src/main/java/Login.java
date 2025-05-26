@@ -46,6 +46,12 @@ public class Login {
      * Password must be at least 8 characters long, contain a capital letter,
      * a number, and a special character
      * 
+     * The following password validation logic was developed with assistance from Claude AI
+     * Anthropic. (2024). Claude (Version 3.5) [Large language model].
+     * https://claude.ai/
+     * Prompt: "Create a method to validate password complexity checking for minimum length, 
+     * uppercase letters, numbers, and special characters using character iteration"
+     * 
      * @param password The password to validate
      * @return true if password meets complexity requirements, false otherwise
      */
